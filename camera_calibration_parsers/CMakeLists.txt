@@ -17,18 +17,18 @@ catkin_package(
 
 find_package(PkgConfig)
 
-
-if (ANDROID)
-    find_package(yaml-cpp)
-    add_definitions(-DHAVE_NEW_YAMLCPP)
+pkg_check_modules(YAMLCPP yaml-cpp QUIET)
+if(NOT YAMLCPP_FOUND)
+  find_package(yaml-cpp 0.6 REQUIRED)
+  set(YAMLCPP_INCLUDE_DIRS ${YAML_CPP_INCLUDE_DIR})
+  set(YAMLCPP_LIBRARIES ${YAML_CPP_LIBRARIES})
+  add_definitions(-DHAVE_YAMLCPP_GT_0_5_0)
 else()
-  pkg_check_modules(YAML_CPP yaml-cpp)
-  if(${YAML_CPP_VERSION} VERSION_GREATER 0.5)
-    add_definitions(-DHAVE_NEW_YAMLCPP)
+  if(YAMLCPP_VERSION VERSION_GREATER "0.5.0")
+    add_definitions(-DHAVE_YAMLCPP_GT_0_5_0)
   endif()
-  link_directories(${YAML_CPP_LIBRARY_DIRS})
+  link_directories(${YAMLCPP_LIBRARY_DIRS})
 endif()
-include_directories(${YAML_CPP_INCLUDE_DIRS})
 
 # define the library
 add_library(${PROJECT_NAME}
